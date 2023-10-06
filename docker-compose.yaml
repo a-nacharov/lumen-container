@@ -31,7 +31,16 @@ services:
       - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
-
+      
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass nacharov
+    volumes: 
+      - cache:/data
+      
   db:
     image: mysql:8.0
     restart: always
@@ -46,10 +55,13 @@ services:
       - '3306'
     volumes:
       - my-db:/var/lib/mysql
+      
 # Names our volume
 volumes:
   my-db:
-
+  cache:
+    driver: local
+    
 networks:
   app-network:
     driver: bridge
